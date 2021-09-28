@@ -91,8 +91,11 @@ def setColName(df):
     return df
 
 
-path = r"D:\00_Study\IS\02_code\00_dataset\05_test_red_hue\original"
+path = r"D:\00_Study\IS\02_code\00_dataset\07_test_red_hue_3\test_input"
 fileLists = os.listdir(path)
+
+#### for test dataset ####
+fileLists = sorted(list(map(lambda x: int(x[:-4]), fileLists)))
 
 tileListsBefore = []
 tileListsAfter = []
@@ -101,90 +104,91 @@ df = []
 colorList = ['red', 'orange', 'yellow', 'green',
             'aqua', 'blue', 'purple', 'magenta']
 
-for i in range(len(fileLists)):
+# for i in range(len(fileLists)):
 # for i in range(100):
+for i in fileLists:
     print(i)
     # Reading image
-    imgBefore =  cv.imread(r"D:\00_Study\IS\02_code\00_dataset\05_test_red_hue\original\{}.jpg".format(i))
-    imgAfter =  cv.imread(r"D:\00_Study\IS\02_code\00_dataset\05_test_red_hue\export\{}.jpg".format(i))
+#     imgBefore =  cv.imread(r"D:\00_Study\IS\02_code\00_dataset\07_test_red_hue_3\test_input\{}.jpg".format(i))
+#     imgAfter =  cv.imread(r"D:\00_Study\IS\02_code\00_dataset\07_test_red_hue_3\test_actual\{}.jpg".format(i))
 
-    heightBefore = imgBefore.shape[0]
-    widthBefore = imgBefore.shape[1]
-    heightAfter = imgAfter.shape[0]
-    widthAfter = imgAfter.shape[1]
+#     heightBefore = imgBefore.shape[0]
+#     widthBefore = imgBefore.shape[1]
+#     heightAfter = imgAfter.shape[0]
+#     widthAfter = imgAfter.shape[1]
 
-    y1 = 0
-    x1 = 0
-    M = math.ceil(heightBefore/5)
-    N = math.ceil(widthBefore/5)
+#     y1 = 0
+#     x1 = 0
+#     M = math.ceil(heightBefore/5)
+#     N = math.ceil(widthBefore/5)
 
-    for y in range(0,heightBefore,M):
-        for x in range(0, widthBefore, N):
-            y1 = y + M
-            x1 = x + N
-            tileBefore = imgBefore[y:y+M,x:x+N]
-            tileListsBefore.append(tileBefore)
-    x1 = 0
-    y1 = 0
-    M = math.ceil(heightAfter/5)
-    N = math.ceil(widthAfter/5)
+#     for y in range(0,heightBefore,M):
+#         for x in range(0, widthBefore, N):
+#             y1 = y + M
+#             x1 = x + N
+#             tileBefore = imgBefore[y:y+M,x:x+N]
+#             tileListsBefore.append(tileBefore)
+#     x1 = 0
+#     y1 = 0
+#     M = math.ceil(heightAfter/5)
+#     N = math.ceil(widthAfter/5)
     
-    for y in range(0,heightAfter,M):
-        for x in range(0, widthAfter, N):
-            y1 = y + M
-            x1 = x + N
-            tileAfter = imgAfter[y:y+M,x:x+N]
-            tileListsAfter.append(tileAfter)
+#     for y in range(0,heightAfter,M):
+#         for x in range(0, widthAfter, N):
+#             y1 = y + M
+#             x1 = x + N
+#             tileAfter = imgAfter[y:y+M,x:x+N]
+#             tileListsAfter.append(tileAfter)
 
 
-for i in range(len(tileListsBefore)):
-    print(i)
-    # select image path
-    imgBefore = tileListsBefore[i]
-    imgAfter = tileListsAfter[i]
-    imgSize = imgBefore.shape[0] * imgBefore.shape[1]
+# for i in range(len(tileListsBefore)):
+#     print(i)
+#     # select image path
+#     imgBefore = tileListsBefore[i]
+#     imgAfter = tileListsAfter[i]
+#     imgSize = imgBefore.shape[0] * imgBefore.shape[1]
 
-    # Convert to HLS
-    imgBefore = cv.cvtColor(imgBefore, cv.COLOR_BGR2HLS)
-    imgAfter = cv.cvtColor(imgAfter, cv.COLOR_BGR2HLS)
+#     # Convert to HLS
+#     imgBefore = cv.cvtColor(imgBefore, cv.COLOR_BGR2HLS)
+#     imgAfter = cv.cvtColor(imgAfter, cv.COLOR_BGR2HLS)
 
-    imgPair = [imgBefore, imgAfter]
-    imgProperties = []
+#     imgPair = [imgBefore, imgAfter]
+#     imgProperties = []
 
-    # get histogram for each channel
-    for img in imgPair:
+#     # get histogram for each channel
+#     for img in imgPair:
 
-        # masking with each color
-        for color in colorList:
+#         # masking with each color
+#         for color in colorList:
 
-            mask = masking(imgBefore, color)
-            maskArea = masking(img, color)
-            maskArea = maskArea[maskArea != 0].shape[0] / imgSize
-            colorProperties = []
+#             mask = masking(imgBefore, color)
+#             maskArea = masking(img, color)
+#             maskArea = maskArea[maskArea != 0].shape[0] / imgSize
+#             colorProperties = []
         
-            hue = cv.calcHist([img], [0], mask, [180], [0,180])
-            lum = cv.calcHist([img], [1], mask, [256], [0,256])
-            sat = cv.calcHist([img], [2], mask, [256], [0,256])
+#             hue = cv.calcHist([img], [0], mask, [180], [0,180])
+#             lum = cv.calcHist([img], [1], mask, [256], [0,256])
+#             sat = cv.calcHist([img], [2], mask, [256], [0,256])
 
-            imgChannels = [hue, lum, sat]
+#             imgChannels = [hue, lum, sat]
 
-            for channel in imgChannels:
+#             for channel in imgChannels:
                 
-                frequency = makeFrequencyDist(channel)
+#                 frequency = makeFrequencyDist(channel)
 
-                channelPropeties = [
-                    calMean(frequency),
-                    calMedian(frequency),
-                    calStd(frequency),
-                    calMax(frequency)]
+#                 channelPropeties = [
+#                     calMean(frequency),
+#                     calMedian(frequency),
+#                     calStd(frequency),
+#                     calMax(frequency)]
                 
-                colorProperties.append(channelPropeties)
+#                 colorProperties.append(channelPropeties)
 
-            colorProperties = list(chain.from_iterable(colorProperties))
-            colorProperties.append(maskArea)
-            imgProperties.append(colorProperties)
+#             colorProperties = list(chain.from_iterable(colorProperties))
+#             colorProperties.append(maskArea)
+#             imgProperties.append(colorProperties)
 
-    df.append(list(chain.from_iterable(imgProperties)))
+#     df.append(list(chain.from_iterable(imgProperties)))
 
-df = pd.DataFrame(df)
-setColName(df).to_csv('210922_1K_img_split_25_blocks.csv')
+# df = pd.DataFrame(df)
+# setColName(df).to_csv('210922_1K_img_split_25_blocks.csv')
